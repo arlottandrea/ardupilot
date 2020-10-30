@@ -573,7 +573,8 @@ void ModeAuto::do_nav_delay(const AP_Mission::Mission_Command& cmd)
             start_stop();
         }
     } else {
-        start_stop();
+        set_desired_speed(5.0);
+        //start_stop();
     }
 
     if (cmd.content.nav_delay.seconds > 0) {
@@ -660,7 +661,7 @@ bool ModeAuto::verify_nav_delay(const AP_Mission::Mission_Command& cmd)
         nav_delay_time_max_ms = 0;
         return true;
     }
-
+    //
     return false;
 }
 
