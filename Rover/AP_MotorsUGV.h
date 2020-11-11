@@ -110,6 +110,9 @@ public:
     //  returns true if checks pass, false if they fail.  display_failure argument should be true to send text messages to GCS
     bool pre_arm_check(bool report) const;
 
+    //MOONDINO
+    void toggle_reverse(bool reversed);
+
     // structure for holding motor limit flags
     struct AP_MotorsUGV_limit {
         uint8_t steer_left      : 1; // we have reached the steering controller's left most limit

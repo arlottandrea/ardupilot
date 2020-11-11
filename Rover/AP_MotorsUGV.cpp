@@ -812,7 +812,7 @@ void AP_MotorsUGV::output_throttle(SRV_Channel::Aux_servo_function_t function, f
                 break;
         }
         // invert the output to always have positive value calculated by calc_pwm
-        throttle = reverse_multiplier * fabsf(throttle);
+        throttle = reverse_multiplier * fabsf(throttle); mod
     }
 
     // output to servo channel
@@ -937,4 +937,15 @@ bool AP_MotorsUGV::active() const
     }
 
     return false;
+}
+
+void AP_MotorsUGV::toggle_reverse(bool reversed)
+{
+     gcs().send_text(MAV_SEVERITY_EMERGENCY, "get reverse value %i", reversed);
+    if(reversed){
+        _relayEvents.do_set_servo(CH_8, 1880 );
+    }
+    else{
+        _relayEvents.do_set_servo(CH_8, 1400 );
+    }
 }

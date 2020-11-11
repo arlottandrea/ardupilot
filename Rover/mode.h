@@ -214,6 +214,8 @@ protected:
     // private members for waypoint navigation
     float _distance_to_destination; // distance from vehicle to final destination in meters
     bool _reached_destination;  // true once the vehicle has reached the destination
+    bool _time_expired;
+    
     float _desired_yaw_cd;      // desired yaw in centi-degrees.  used in Auto, Guided and Loiter
 };
 
@@ -287,7 +289,7 @@ protected:
         Auto_RTL,               // perform RTL within auto mode
         Auto_Loiter,            // perform Loiter within auto mode
         Auto_Guided,            // handover control to external navigation system from within auto mode
-        Auto_Stop               // stop the vehicle as quickly as possible
+        Auto_Stop,       // stop the vehicle as quickly as possible
     } _submode;
 
 private:
@@ -335,7 +337,10 @@ private:
     // HeadingAndSpeed sub mode variables
     float _desired_speed;   // desired speed in HeadingAndSpeed submode
     bool _reached_heading;  // true when vehicle has reached desired heading in TurnToHeading sub mode
-
+    Location _start_loc;
+    bool _nav_end_row_reached;
+    float _distance_to_end_row;
+    
     // Loiter control
     uint16_t loiter_duration;       // How long we should loiter at the nav_waypoint (time in seconds)
     uint32_t loiter_start_time;     // How long have we been loitering - The start time in millis
@@ -359,6 +364,9 @@ private:
     // Delay the next navigation command
     uint32_t nav_delay_time_max_ms;  // used for delaying the navigation commands
     uint32_t nav_delay_time_start_ms;
+
+    uint32_t nav_end_row_time_max_ms;  // used for delaying the navigation commands
+    uint32_t nav_end_row_time_start_ms;
 
 };
 
