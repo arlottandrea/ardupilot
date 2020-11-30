@@ -58,7 +58,7 @@ bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint16_t pwm)
     return true;
 }
 
-bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint8_t state)
+bool AP_ServoRelayEvents::do_set_relay_pwm(uint8_t _channel, uint8_t state)
 {
     SRV_Channel *c = SRV_Channels::srv_channel(_channel-1);
     if (c == nullptr) {
@@ -89,7 +89,9 @@ bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint8_t state)
         c->set_output_pwm(PWM_OFF);
         c->ignore_small_rcin_changes();
     } else {
-        c->set_output_norm(-(c->get_output_norm()));
+        //c->set_output_norm(-());
+        c->set_output_pwm(PWM_ON);
+        c->ignore_small_rcin_changes();
     }
     return true;
 }

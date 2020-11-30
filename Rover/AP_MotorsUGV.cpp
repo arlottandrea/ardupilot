@@ -798,24 +798,24 @@ void AP_MotorsUGV::output_throttle(SRV_Channel::Aux_servo_function_t function, f
             case SRV_Channel::k_throttle:
             case SRV_Channel::k_throttleLeft:
             case SRV_Channel::k_motor1:
-                _relayEvents.do_set_servo(PWM_RELAY1, relay_high);
+                _relayEvents.do_set_relay_pwm(PWM_RELAY1, relay_high);
                 break;
             case SRV_Channel::k_throttleRight:
             case SRV_Channel::k_motor2:
-                _relayEvents.do_set_servo(PWM_RELAY2, relay_high);
+                _relayEvents.do_set_relay_pwm(PWM_RELAY2, relay_high);
                 break;
             case SRV_Channel::k_motor3:
-                _relayEvents.do_set_servo(2, relay_high);
+                _relayEvents.do_set_relay_pwm(2, relay_high);
                 break;
             case SRV_Channel::k_motor4:
-                _relayEvents.do_set_servo(3, relay_high);
+                _relayEvents.do_set_relay_pwm(3, relay_high);
                 break;
             default:
                 // do nothing
                 break;
         }
         // invert the output to always have positive value calculated by calc_pwm
-        throttle = reverse_multiplier * fabsf(throttle); mod
+        throttle = reverse_multiplier * fabsf(throttle); 
     }
 
     // output to servo channel
