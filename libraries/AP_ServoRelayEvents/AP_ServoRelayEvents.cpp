@@ -24,6 +24,9 @@
 #include <SRV_Channel/SRV_Channel.h>
 #include <GCS_MAVLink/GCS.h>
 
+#define PWM_ON  2000
+#define PWM_OFF 900
+
 extern const AP_HAL::HAL& hal;
 
 bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint16_t pwm)
@@ -52,6 +55,42 @@ bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint16_t pwm)
     }
     c->set_output_pwm(pwm);
     c->ignore_small_rcin_changes();
+    return true;
+}
+
+bool AP_ServoRelayEvents::do_set_servo(uint8_t _channel, uint8_t state)
+{
+    SRV_Channel *c = SRV_Channels::srv_channel(_channel-1);
+    if (c == nullptr) {
+        return false;
+    }
+    switch(c->get_function())
+    {
+    case SRV_Channel::k_none:
+    case SRV_Channel::k_manual:
+    case SRV_Channel::k_sprayer_pump:
+    case SRV_Channel::k_sprayer_spinner:
+    case SRV_Channel::k_gripper:
+    case SRV_Channel::k_rcin1 ... SRV_Channel::k_rcin16: // rc pass-thru
+        break;
+    default:
+        gcs().send_text(MAV_SEVERITY_INFO, "ServoRelayEvent: Channel %d is already in use", _channel);
+        return false;
+    }
+    if (type == EVENT_TYPE_SERVO && 
+        channel == _channel) {
+        // cancel previous repeat
+        repeat = 0;
+    }
+    if (state == 1) {
+        c->set_output_pwm(PWM_ON);
+        c->ignore_small_rcin_changes();
+    } else if (state == 0) {
+        c->set_output_pwm(PWM_OFF);
+        c->ignore_small_rcin_changes();
+    } else {
+        c->set_output_norm(-(c->get_output_norm()));
+    }
     return true;
 }
 

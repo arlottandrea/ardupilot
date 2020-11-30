@@ -2,6 +2,7 @@
 #include "Rover.h"
 
 #define AUTO_GUIDED_SEND_TARGET_MS 1000
+#define AUTO_SET_YAW_SPEED_DISTANCE 3
 
 bool ModeAuto::_enter()
 {
@@ -81,7 +82,7 @@ void ModeAuto::update()
                     calc_throttle(calc_speed_nudge(_desired_speed, is_negative(_desired_speed)), true);
 
                     _distance_to_end_row = rover.current_loc.get_distance(_start_loc);
-                    _nav_end_row_reached = (_distance_to_end_row > 5);
+                    _nav_end_row_reached = (_distance_to_end_row > AUTO_SET_YAW_SPEED_DISTANCE);
                     gcs().send_text(MAV_SEVERITY_WARNING, "distance : %f", _distance_to_end_row);
                     }
                     else{
@@ -807,7 +808,7 @@ void ModeAuto::do_set_home(const AP_Mission::Mission_Command& cmd)
 void ModeAuto::do_set_reverse(const AP_Mission::Mission_Command& cmd)
 {
     set_reversed(cmd.p1 == 1);
-    g2.motors.toggle_reverse(cmd.p1 == 1));
+    //g2.motors.toggle_reverse(cmd.p1 == 1);
 }
 
 // set timeout and position limits for guided within auto

@@ -546,6 +546,9 @@ void Display::update_text_empty(uint8_t r)
     _movedelay = 0;
     _mstartpos = 0;
     draw_text(COLUMN(0), ROW(r), msg);
+    snprintf(msg, DISPLAY_MESSAGE_SIZE, "MOONDINO") ;
+    draw_text(COLUMN(0), ROW(r), msg);
+
 }
 
 void Display::update_text(uint8_t r)

@@ -17,6 +17,9 @@
 #include "AP_MotorsUGV.h"
 #include "Rover.h"
 
+#define PWM_RELAY1 8
+#define PWM_RELAY2 9
+
 extern const AP_HAL::HAL& hal;
 
 // parameters for the motor class
@@ -795,17 +798,17 @@ void AP_MotorsUGV::output_throttle(SRV_Channel::Aux_servo_function_t function, f
             case SRV_Channel::k_throttle:
             case SRV_Channel::k_throttleLeft:
             case SRV_Channel::k_motor1:
-                _relayEvents.do_set_relay(0, relay_high);
+                _relayEvents.do_set_servo(PWM_RELAY1, relay_high);
                 break;
             case SRV_Channel::k_throttleRight:
             case SRV_Channel::k_motor2:
-                _relayEvents.do_set_relay(1, relay_high);
+                _relayEvents.do_set_servo(PWM_RELAY2, relay_high);
                 break;
             case SRV_Channel::k_motor3:
-                _relayEvents.do_set_relay(2, relay_high);
+                _relayEvents.do_set_servo(2, relay_high);
                 break;
             case SRV_Channel::k_motor4:
-                _relayEvents.do_set_relay(3, relay_high);
+                _relayEvents.do_set_servo(3, relay_high);
                 break;
             default:
                 // do nothing
