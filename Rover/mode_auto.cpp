@@ -2,6 +2,7 @@
 #include "Rover.h"
 
 #define AUTO_GUIDED_SEND_TARGET_MS 1000
+#define AUTO_SET_YAW_SPEED_DISTANCE 3
 
 bool ModeAuto::_enter()
 {
@@ -66,17 +67,27 @@ void ModeAuto::update()
             if (!_reached_heading) {
                 // run steering and throttle controllers
                 calc_steering_to_heading(_desired_yaw_cd);
-                calc_throttle(calc_speed_nudge(_desired_speed, is_negative(_desired_speed)), true);
-                // check if we have reached within 5 degrees of target
-                _reached_heading = (fabsf(_desired_yaw_cd - ahrs.yaw_sensor) < 500);
+                _reached_heading = (fabsf(_desired_yaw_cd - ahrs.yaw_sensor) < 100000);
+                gcs().send_text(MAV_SEVERITY_WARNING, "yawing %f",(fabsf(_desired_yaw_cd - ahrs.yaw_sensor)));
             } else {
+                    set_steering(0.0f);
                 // we have reached the destination so stay here
                 if (rover.is_boat()) {
                     if (!start_loiter()) {
                         stop_vehicle();
                     }
                 } else {
-                    stop_vehicle();
+                    if(!_nav_end_row_reached){
+                    // check if we have reached within 5 degrees of target
+                    calc_throttle(calc_speed_nudge(_desired_speed, is_negative(_desired_speed)), true);
+
+                    _distance_to_end_row = rover.current_loc.get_distance(_start_loc);
+                    _nav_end_row_reached = (_distance_to_end_row > AUTO_SET_YAW_SPEED_DISTANCE);
+                    gcs().send_text(MAV_SEVERITY_WARNING, "distance : %f", _distance_to_end_row);
+                    }
+                    else{
+                        stop_vehicle();
+                    }
                 }
             }
             break;
@@ -209,6 +220,7 @@ bool ModeAuto::set_desired_speed(float speed)
     case Auto_WP:
     case Auto_Stop:
         if (!is_negative(speed)) {
+            
             g2.wp_nav.set_desired_speed(speed);
             return true;
         }
@@ -347,7 +359,7 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
 
     switch (cmd.id) {
     case MAV_CMD_NAV_WAYPOINT:  // Navigate to Waypoint
-        return do_nav_wp(cmd, false);
+        return do_nav_wp(cmd, true);
 
     case MAV_CMD_NAV_RETURN_TO_LAUNCH:
         do_RTL();
@@ -365,7 +377,7 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         do_nav_set_yaw_speed(cmd);
         break;
 
-    case MAV_CMD_NAV_DELAY:                    // 93 Delay the next navigation command
+    case MAV_CMD_NAV_DELAY:               // 93 Delay the next navigation command
         do_nav_delay(cmd);
         break;
 
@@ -572,9 +584,8 @@ void ModeAuto::do_nav_delay(const AP_Mission::Mission_Command& cmd)
         if (!start_loiter()) {
             start_stop();
         }
-    } else {
-        set_desired_speed(5.0);
-        //start_stop();
+    } else {     
+        start_stop();
     }
 
     if (cmd.content.nav_delay.seconds > 0) {
@@ -599,11 +610,15 @@ void ModeAuto::do_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
 void ModeAuto::do_nav_set_yaw_speed(const AP_Mission::Mission_Command& cmd)
 {
     float desired_heading_cd;
+    bool ok_position;
+    _submode = Auto_HeadingAndSpeed;
 
+    gcs().send_text(MAV_SEVERITY_INFO, "entro in desired heading speed");
     // get final angle, 1 = Relative, 0 = Absolute
     if (cmd.content.set_yaw_speed.relative_angle > 0) {
         // relative angle
         desired_heading_cd = wrap_180_cd(ahrs.yaw_sensor + cmd.content.set_yaw_speed.angle_deg * 100.0f);
+        gcs().send_text(MAV_SEVERITY_INFO, "angolo relativo");
     } else {
         // absolute angle
         desired_heading_cd = cmd.content.set_yaw_speed.angle_deg * 100.0f;
@@ -615,7 +630,19 @@ void ModeAuto::do_nav_set_yaw_speed(const AP_Mission::Mission_Command& cmd)
     _desired_yaw_cd = desired_heading_cd;
     _reached_heading = false;
     _reached_destination = false;
-    _submode = Auto_HeadingAndSpeed;
+    
+    //
+    _nav_end_row_reached = false;
+    ok_position = ahrs.get_position(_start_loc);
+    if(ok_position){
+        gcs().send_text(MAV_SEVERITY_INFO, "current location");
+    }
+    
+    //
+    //nav_delay_time_start_ms = millis();
+    //nav_delay_time_max_ms = 10000;
+    //
+    
 }
 
 /********************************************************************************/
@@ -661,7 +688,6 @@ bool ModeAuto::verify_nav_delay(const AP_Mission::Mission_Command& cmd)
         nav_delay_time_max_ms = 0;
         return true;
     }
-    //
     return false;
 }
 
@@ -710,7 +736,7 @@ bool ModeAuto::verify_nav_guided_enable(const AP_Mission::Mission_Command& cmd)
 bool ModeAuto::verify_nav_set_yaw_speed()
 {
     if (_submode == Auto_HeadingAndSpeed) {
-        return _reached_heading;
+            return (_nav_end_row_reached);
     }
     // we should never reach here but just in case, return true to allow missions to continue
     return true;
@@ -782,6 +808,7 @@ void ModeAuto::do_set_home(const AP_Mission::Mission_Command& cmd)
 void ModeAuto::do_set_reverse(const AP_Mission::Mission_Command& cmd)
 {
     set_reversed(cmd.p1 == 1);
+    //g2.motors.toggle_reverse(cmd.p1 == 1);
 }
 
 // set timeout and position limits for guided within auto

@@ -27,6 +27,7 @@ public:
     }
 
     bool do_set_servo(uint8_t channel, uint16_t pwm);
+    bool do_set_relay_pwm(uint8_t channel,  uint8_t state);
     bool do_set_relay(uint8_t relay_num, uint8_t state);
     bool do_repeat_servo(uint8_t channel, uint16_t servo_value, int16_t repeat, uint16_t delay_time_ms);
     bool do_repeat_relay(uint8_t relay_num, int16_t count, uint32_t period_ms);
