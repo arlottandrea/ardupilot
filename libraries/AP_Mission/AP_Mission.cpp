@@ -854,7 +854,7 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.p1 = (passby << 8) | (acp & 0x00FF);
 #else
         // delay at waypoint in seconds (this is for copters???)
-        cmd.p1 = packet.param1;
+        cmd.p1 = packet.param1;   
 #endif
     }
     break;
@@ -1078,6 +1078,7 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.content.set_yaw_speed.angle_deg = packet.param1;        // target angle in degrees
         cmd.content.set_yaw_speed.speed = packet.param2;            // speed in meters/second
         cmd.content.set_yaw_speed.relative_angle = packet.param3;   // 0 = absolute angle, 1 = relative angle
+        cmd.content.set_yaw_speed.distance = packet.param4;         // distance from last wp
         break;
 
     case MAV_CMD_DO_WINCH:                              // MAV ID: 42600
@@ -1518,6 +1519,7 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
         packet.param1 = cmd.content.set_yaw_speed.angle_deg;        // target angle in degrees
         packet.param2 = cmd.content.set_yaw_speed.speed;            // speed in meters/second
         packet.param3 = cmd.content.set_yaw_speed.relative_angle;   // 0 = absolute angle, 1 = relative angle
+        packet.param4 =cmd.content.set_yaw_speed.distance;         // distance from last wp
         break;
 
     case MAV_CMD_DO_WINCH:

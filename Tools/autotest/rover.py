@@ -23,8 +23,8 @@ from pymavlink import mavutil
 # get location of scripts
 testdir = os.path.dirname(os.path.realpath(__file__))
 
-SITL_START_LOCATION = mavutil.location(40.071374969556928,
-                                       -105.22978898137808,
+SITL_START_LOCATION = mavutil.location(44.6597467,
+                                       8.589499,
                                        1583.702759,
                                        246)
 

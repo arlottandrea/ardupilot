@@ -82,7 +82,7 @@ void ModeAuto::update()
                     calc_throttle(calc_speed_nudge(_desired_speed, is_negative(_desired_speed)), true);
 
                     _distance_to_end_row = rover.current_loc.get_distance(_start_loc);
-                    _nav_end_row_reached = (_distance_to_end_row > AUTO_SET_YAW_SPEED_DISTANCE);
+                    _nav_end_row_reached = (_distance_to_end_row > _desired_distance);
                     gcs().send_text(MAV_SEVERITY_WARNING, "distance : %f", _distance_to_end_row);
                     }
                     else{
@@ -630,7 +630,7 @@ void ModeAuto::do_nav_set_yaw_speed(const AP_Mission::Mission_Command& cmd)
     _desired_yaw_cd = desired_heading_cd;
     _reached_heading = false;
     _reached_destination = false;
-    
+    _desired_distance = cmd.content.set_yaw_speed.distance ;
     //
     _nav_end_row_reached = false;
     ok_position = ahrs.get_position(_start_loc);

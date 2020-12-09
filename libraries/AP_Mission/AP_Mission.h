@@ -187,6 +187,7 @@ public:
     struct PACKED Set_Yaw_Speed {
         float angle_deg;        // target angle in degrees (0=north, 90=east)
         float speed;            // speed in meters/second
+        float distance;
         uint8_t relative_angle; // 0 = absolute angle, 1 = relative angle
     };
 

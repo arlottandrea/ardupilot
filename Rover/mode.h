@@ -336,6 +336,7 @@ private:
 
     // HeadingAndSpeed sub mode variables
     float _desired_speed;   // desired speed in HeadingAndSpeed submode
+    float _desired_distance;
     bool _reached_heading;  // true when vehicle has reached desired heading in TurnToHeading sub mode
     Location _start_loc;
     bool _nav_end_row_reached;

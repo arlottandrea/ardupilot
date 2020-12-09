@@ -21,7 +21,7 @@ extern const AP_HAL::HAL& hal;
 
 #define AR_WPNAV_TIMEOUT_MS             100
 #define AR_WPNAV_SPEED_DEFAULT          2.0f
-#define AR_WPNAV_RADIUS_DEFAULT         2.0f
+#define AR_WPNAV_RADIUS_DEFAULT         0.1f
 #define AR_WPNAV_OVERSHOOT_DEFAULT      2.0f
 #define AR_WPNAV_PIVOT_ANGLE_DEFAULT    60
 #define AR_WPNAV_PIVOT_ANGLE_ACCURACY   10      // vehicle will pivot to within this many degrees of destination
